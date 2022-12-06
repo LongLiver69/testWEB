@@ -1,0 +1,139 @@
+
+<div class="mx-5 mt-5">
+    <h1>Sửa thông tin</h1>
+    <form class="mt-3" method="POST" action="/Student/{{student._id}}?_method=PUT">
+        <div class="form-group">
+            <label for="mssv">Mã sinh viên</label>
+            <span id="loi_mssv" class="text-danger" style="float:right"></span>
+            <input type="text" class="form-control" value="{{student.mssv}}" id="mssv" name="mssv" autofocus disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Họ và tên</label>
+            <input type="text" class="form-control" value="{{student.name}}" id="name" name="name">
+        </div>
+
+        <div class="form-group">
+            <label for="dateOfBirth">Ngày sinh</label>
+            <span id="loi_dfb" class="text-danger" style="float:right"></span>
+            <input type="text" class="form-control" value="{{student.dateOfBirth}}" id="dateOfBirth" name="dateOfBirth">
+        </div>
+
+        <div class="form-group">
+            <label for="address">Quê quán</label>
+            <input type="text" class="form-control" value="{{student.address}}" id="address" name="address">
+        </div>
+
+        <div class="form-group">
+            <label for="image">Link ảnh</label>
+            <input type="text" class="form-control" value="{{student.image}}" id="image" name="image">
+        </div>
+
+        <a href="/Students" class="btn btn-secondary">Hủy</a>
+        <button class="btn btn-primary">Lưu lại</button>
+    </form>
+</div>
+
+
+{{!-- Cac ham kiem tra --}}
+<script>
+
+    function normalizeName(objId) {
+        var str = document.getElementById(objId).value;
+        arr = str.split(' ');
+        str = "";
+        for (i = 0; i < arr.length; i++)
+            if (arr[i].length > 0) {
+                if (str.length > 0) str = str + " ";
+                str = str + arr[i].substring(0, 1).toUpperCase();
+                str = str + arr[i].substring(1).toLowerCase();
+            }
+        document.getElementById(objId).value = str;       
+    }   
+
+    function isMssv(x) {
+        if (x == "") return false;
+        if (x.length !== 8) return false;
+        else {
+            for(let i=0; i < x.length; i++) {
+                if(x[i] < '0' || x[i] > '9') {
+                    return false;
+                }
+            }
+        } 
+        return true;
+    }
+
+    function isDateOfBirth(d) { 
+        if(d == "") return false;
+        if(d.length == 8) {
+            var ktra = true;
+            for(let i=0; i < d.length; i++) {
+                if(d[i] < '0' || d[i] > '9') {
+                    ktra = false;
+                    break;
+                }
+            }
+            if(ktra == true) {
+                var d = d.substring(0,2) + '/' + d.substring(2,4) + '/' + d.substring(4);
+                document.getElementById("dateOfBirth").value = d;
+            } else {
+                return false;
+            }
+        }
+        s = d.split('/');
+
+        if (s.length != 3) return false; 
+        if (isNaN(s[0]) || isNaN(s[1]) || isNaN(s[2])) return false;
+        if (s[0].length!=2 || s[1].length!=2 || s[2].length!=4) return false;
+
+        ngay = parseInt(s[0]);
+        thang = parseInt(s[1]);
+        nam = parseInt(s[2]);
+
+        if (thang > 12 || thang < 1) return false;
+        if (thang == 1 || thang == 3 || thang == 5 || thang == 7 || thang == 8 || thang == 10 || thang == 12) {
+            if (ngay > 31) return false;
+        } else if (thang == 2){
+            if (nam%4 == 0 && nam%100 != 0) {
+                if (ngay > 29) return false;
+            } else if (ngay > 28) return false;
+        } else {
+            if (ngay > 30) return false;
+        }
+        if (ngay < 1 || thang < 1 || nam < 1) return false;
+
+        date = new Date();
+        if (nam > date.getFullYear() || nam < 1950) return false;
+        return true;
+    }
+
+    var ngaysinh = document.getElementById("dateOfBirth");
+    ngaysinh.onblur = function () {
+        if(!isDateOfBirth(ngaysinh.value)) {
+		    document.getElementById("loi_dfb").innerHTML = "Ngày sinh không đúng định dạng";
+            ngaysinh.focus();
+        } else {
+            document.getElementById("loi_dfb").innerHTML = "";
+        }
+    }
+
+    var masv = document.getElementById("mssv");
+    masv.onblur = function () {
+        if(!isMssv(masv.value)) {
+		    document.getElementById("loi_mssv").innerHTML = "Mã sinh viên không đúng định dạng";
+            masv.focus();
+        } else {
+            document.getElementById("loi_mssv").innerHTML = "";
+        }
+    }
+
+    document.getElementById("name").onblur = function () {
+        normalizeName('name');
+    }
+    
+    document.getElementById("address").onblur = function () {
+        normalizeName('address');
+    }
+
+</script>
